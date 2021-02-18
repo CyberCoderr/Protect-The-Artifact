@@ -1,0 +1,192 @@
+using System.Collections;
+using UnityEngine;
+using TMPro;
+using UnityEngine.Serialization;
+
+public class TimedEnemySpawner : MonoBehaviour
+{
+    [SerializeField] private GameObject enemy;
+    [SerializeField] private GameObject SEnemy;
+    [SerializeField] private int minEnemiesPerSpawn = 1;
+    [SerializeField] private TextMeshProUGUI NotificationsText;
+    [SerializeField] private int maxEnemiesPerSpawn = 2;
+    [SerializeField] private float SEnemyTimer;
+    [SerializeField] private bool SEnemyReadyToSpawn = false;
+    [SerializeField] private bool sEnemyCalled = false;
+    private double nextSpawnTime;
+    [FormerlySerializedAs("bossSpawnProcent")] [SerializeField] private int bossSpawnNumber;
+    [SerializeField] private bool bossShouldSpawn = false;
+    [SerializeField] private GameObject bossEnemy;
+    [SerializeField] private bool tntShouldSpawn = false;
+    [SerializeField] private GameObject tntEnemy;
+    [SerializeField] private int tntSpawnNumber;
+
+    private void Start()
+    {
+        StartCoroutine(SEnemySpawner());
+        
+        if (Player.survivalMode == true)
+        {
+            StartCoroutine(survivalSpawner());
+        }
+        StartCoroutine(BossSpawnManager());
+        StartCoroutine(TntSpawnManager());
+    }
+
+    private void Update()
+    {
+        if (ShootingEnemyController.shooterExists == false && SEnemyReadyToSpawn == false && sEnemyCalled == false)
+        {
+            StartCoroutine(SEnemySpawner());
+            sEnemyCalled = true;
+        }
+        
+        if (IsReadyToSpawn())
+        {
+            SpawnEnemies();
+            double secondsBetweenSpawns = Random.Range(3f, 5f);
+            
+            nextSpawnTime = Time.time + secondsBetweenSpawns;
+        }
+        
+    }
+
+    private bool IsReadyToSpawn()
+    {
+        return Time.time >= nextSpawnTime;
+    }
+
+    private void SpawnEnemies()
+    {
+        var enemiesToSpawn = Random.Range(minEnemiesPerSpawn, maxEnemiesPerSpawn);
+
+        for (int i = 0; i < enemiesToSpawn; i++)
+        {
+            SpawnEnemy();
+        }
+    }
+
+    private void SpawnEnemy()
+    {
+        float spawnPointX = Random.Range(-11f, 11f);
+        float spawnPointY = Random.Range(2f, 4.5f);
+        Vector3 offset = new Vector3(spawnPointX, spawnPointY, 0);
+        Instantiate(enemy, transform.position + offset, Quaternion.identity);
+
+        if(SEnemyReadyToSpawn == true)
+        {
+            Instantiate(SEnemy, transform.position + offset, Quaternion.identity);
+            SEnemyReadyToSpawn = false;
+            sEnemyCalled = false;
+        }
+
+        if (bossShouldSpawn == true)
+        {
+            Instantiate(bossEnemy, transform.position + offset, Quaternion.identity);
+            bossShouldSpawn = false;
+        }
+        if (tntShouldSpawn == true)
+        {
+            Instantiate(tntEnemy, transform.position + offset, Quaternion.identity);
+            tntShouldSpawn = false;
+        }
+    }
+
+    IEnumerator SEnemySpawner()
+    {
+            SEnemyTimer = Random.Range(20f, 35f);
+            yield return new WaitForSeconds(SEnemyTimer);
+            SEnemyReadyToSpawn = true;
+
+    }
+    IEnumerator survivalSpawner()
+    {
+        minEnemiesPerSpawn = 1;
+        maxEnemiesPerSpawn = 2;
+        yield return new  WaitForSeconds(30);
+        minEnemiesPerSpawn = 2;
+        maxEnemiesPerSpawn = 3;
+        NotificationsText.text = "Difficulty Increased";
+        yield return new WaitForSeconds(2);
+        NotificationsText.text = "";
+        yield return new  WaitForSeconds(25);
+        minEnemiesPerSpawn = 2;
+        maxEnemiesPerSpawn = 4;
+        NotificationsText.text = "Difficulty Increased";
+        yield return new WaitForSeconds(2);
+        NotificationsText.text = "";
+        yield return new  WaitForSeconds(50);
+        minEnemiesPerSpawn = 3;
+        maxEnemiesPerSpawn = 4;
+        NotificationsText.text = "Difficulty Increased";
+        yield return new WaitForSeconds(2);
+        NotificationsText.text = "";
+        yield return new  WaitForSeconds(40);
+        minEnemiesPerSpawn = 3;
+        maxEnemiesPerSpawn = 5;
+        NotificationsText.text = "Difficulty Increased";
+        yield return new WaitForSeconds(2);
+        NotificationsText.text = "";
+        yield return new  WaitForSeconds(35);
+        minEnemiesPerSpawn = 4;
+        maxEnemiesPerSpawn = 5;
+        NotificationsText.text = "Difficulty Increased";
+        yield return new WaitForSeconds(2);
+        NotificationsText.text = "";
+        yield return new  WaitForSeconds(60);
+        minEnemiesPerSpawn = 4;
+        maxEnemiesPerSpawn = 7;
+        NotificationsText.text = "Difficulty Increased";
+        yield return new WaitForSeconds(2);
+        NotificationsText.text = "";
+        yield return new  WaitForSeconds(50);
+        minEnemiesPerSpawn = 5;
+        maxEnemiesPerSpawn = 7;
+        NotificationsText.text = "Difficulty Increased";
+        yield return new WaitForSeconds(2);
+        NotificationsText.text = "";
+        yield return new  WaitForSeconds(90);
+        minEnemiesPerSpawn = 6;
+        maxEnemiesPerSpawn = 7;
+        NotificationsText.text = "Difficulty Increased";
+        yield return new WaitForSeconds(2);
+        NotificationsText.text = "";
+        yield return new  WaitForSeconds(70);
+        minEnemiesPerSpawn = 6;
+        maxEnemiesPerSpawn = 8;
+        NotificationsText.text = "";
+        yield return new WaitForSeconds(2);
+        NotificationsText.enabled = false;
+        yield return new  WaitForSeconds(120);
+        minEnemiesPerSpawn = 7;
+        maxEnemiesPerSpawn = 9;
+        NotificationsText.text = "Max Difficluty Reaced";
+        yield return new WaitForSeconds(2);
+        NotificationsText.text = "";
+
+    }
+
+    IEnumerator BossSpawnManager()
+    {
+        yield return new WaitForSeconds(20);
+        bossSpawnNumber = Random.Range(0, 5);
+        if (bossSpawnNumber == 3)
+        {
+            bossShouldSpawn = true;
+        }
+
+        StartCoroutine(BossSpawnManager());
+    }
+
+    IEnumerator TntSpawnManager()
+    {
+        yield return new WaitForSeconds(10);
+        tntSpawnNumber = Random.Range(1, 3);
+        if (tntSpawnNumber == 1)
+        {
+            tntShouldSpawn = true;
+        }
+
+        StartCoroutine(TntSpawnManager());
+    }
+}
