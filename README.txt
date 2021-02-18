@@ -1,1 +1,1 @@
-You are not allowed to use the any code without crediting 'Cyber Coder'.
+© Cyber Coder 2021. Code in this repository is official property of Cyber Coder. Although copyright is not officially registered I claim full ownership of all code in this repository. Use of code is allowed in private project. Commercial use of code is not allowed unless approved by Cyber Coder.
